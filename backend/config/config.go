@@ -1,5 +1,7 @@
 package config
 
+import "os"
+
 type Config struct {
 	ServerHost       string
 	ServerPort       string
@@ -14,13 +16,13 @@ var conf Config
 
 func init() {
 	conf = Config{
-		ServerHost:       "localhost",
-		ServerPort:       "4000",
-		DatabaseHost:     "localhost",
-		DatabasePort:     "5432",
-		DatabaseUser:     "postgres",
-		DatabasePassword: "P@ssW02d123",
-		DatabaseName:     "db_worker",
+		ServerHost:       os.Getenv("SERVER_HOST"),
+		ServerPort:       os.Getenv("SERVER_PORT"),
+		DatabaseHost:     os.Getenv("DATABASE_HOST"),
+		DatabasePort:     os.Getenv("DATABASE_PORT"),
+		DatabaseUser:     os.Getenv("DATABASE_USER"),
+		DatabasePassword: os.Getenv("DATABASE_PASSWORD"),
+		DatabaseName:     os.Getenv("DATABASE_NAME"),
 	}
 }
 func NewConfig() *Config {
