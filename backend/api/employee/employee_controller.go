@@ -7,7 +7,7 @@ import (
 )
 
 type EmployeeController struct {
-	employeeUsecase *EmployeeUsecase
+	employeeUsecase EmployeeUsecase
 }
 
 func newEmployeeController(db *pg.DB) *EmployeeController {
@@ -32,7 +32,7 @@ func (ec *EmployeeController) createEmployee(ctx *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	result, err := ec.employeeUsecase.createEmployee(&employee)
+	err = ec.employeeUsecase.createEmployee(&employee)
 	if err != nil {
 		ctx.JSON(504, "Internal server error")
 		return
@@ -40,7 +40,6 @@ func (ec *EmployeeController) createEmployee(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"code":   200,
 		"status": "ok",
-		"result": result,
 	})
 }
 func (ec *EmployeeController) updateEmployee(ctx *gin.Context) {

@@ -5,17 +5,16 @@ import (
 	"log"
 )
 
-type EmployeeRepositoryInterface interface {
+type EmployeeRepository interface {
 	getAllEmployees() (*[]Employee, error)
-	createEmployee(employee *Employee) (*Employee, error)
+	createEmployee(employee *Employee) error
 	updateEmployee(employee *Employee) error
-	deleteEmployee(id *int) error
+	deleteEmployee(id *string) error
 }
-type EmployeeRepository struct {
+type EmployeeRepositoryImpl struct {
 	db *pg.DB
 }
-
-func (e EmployeeRepository) getAllEmployees() (*[]Employee, error) {
+func (e EmployeeRepositoryImpl) getAllEmployees() (*[]Employee, error) {
 	var employees []Employee
 
 	_, err := e.db.Query(&employees, "SELECT * FROM m_employee where is_delete = ? ", 0)
@@ -26,7 +25,7 @@ func (e EmployeeRepository) getAllEmployees() (*[]Employee, error) {
 	return &employees, nil
 }
 
-func (e EmployeeRepository) createEmployee(employee *Employee) (*int, error) {
+func (e EmployeeRepositoryImpl) createEmployee(employee *Employee) error {
 	tx, err := e.db.Begin()
 	if err != nil {
 		panic(err)
@@ -34,20 +33,20 @@ func (e EmployeeRepository) createEmployee(employee *Employee) (*int, error) {
 	stmt, err := tx.Prepare(`INSERT INTO m_employee (id,full_name,birth_date,position_id,id_number,gender) VALUES ($1,$2,$3,$4,$5,$6)`)
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return err
 	}
-	res, err := stmt.Exec(&employee.ID, &employee.FullName, &employee.BirthDate, &employee.PositionID, &employee.IDNumber, &employee.Gender)
+	_, err = stmt.Exec(&employee.ID, &employee.FullName, &employee.BirthDate, &employee.PositionID, &employee.IDNumber, &employee.Gender)
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return err
 	}
-	userCreated := res.RowsReturned()
+	//userCreated := res.RowsReturned()
 	tx.Commit()
 
-	return &userCreated, nil
+	return nil
 }
 
-func (e EmployeeRepository) updateEmployee(emp *Employee) error {
+func (e EmployeeRepositoryImpl) updateEmployee(emp *Employee) error {
 	tx, err := e.db.Begin()
 	if err != nil {
 		return err
@@ -67,7 +66,7 @@ func (e EmployeeRepository) updateEmployee(emp *Employee) error {
 	return nil
 }
 
-func (e EmployeeRepository) deleteEmployee(id *string) error {
+func (e EmployeeRepositoryImpl) deleteEmployee(id *string) error {
 	tx, err := e.db.Begin()
 	if err != nil {
 		tx.Rollback()
@@ -89,9 +88,8 @@ func (e EmployeeRepository) deleteEmployee(id *string) error {
 	tx.Commit()
 
 	return nil
-
 }
 
-func newEmployeeRepository(db *pg.DB) *EmployeeRepository {
-	return &EmployeeRepository{db: db}
+func newEmployeeRepository(db *pg.DB) EmployeeRepository {
+	return &EmployeeRepositoryImpl{db: db}
 }

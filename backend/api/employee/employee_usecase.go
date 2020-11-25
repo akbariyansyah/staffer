@@ -2,17 +2,17 @@ package employee
 
 import "github.com/go-pg/pg"
 
-type EmployeeUsecaseInterface interface {
+type EmployeeUsecase interface {
 	getAllEmployees() (*[]Employee, error)
-	createEmployee(employee *Employee) (*int,error)
+	createEmployee(employee *Employee) error
 	updateEmployee(employee *Employee) error
 	deleteEmployee(id *string) error
 }
-type EmployeeUsecase struct {
-	employeeRepo *EmployeeRepository
+type EmployeeUsecaseImpl struct {
+	employeeRepo EmployeeRepository
 }
 
-func (e EmployeeUsecase) getAllEmployees() (*[]Employee, error) {
+func (e EmployeeUsecaseImpl) getAllEmployees() (*[]Employee, error) {
 	result, err := e.employeeRepo.getAllEmployees()
 	if err != nil {
 		return nil, err
@@ -20,15 +20,15 @@ func (e EmployeeUsecase) getAllEmployees() (*[]Employee, error) {
 	return result, nil
 }
 
-func (e EmployeeUsecase) createEmployee(employee *Employee) (*int,error) {
-	result,err := e.employeeRepo.createEmployee(employee)
+func (e EmployeeUsecaseImpl) createEmployee(employee *Employee) error {
+	err := e.employeeRepo.createEmployee(employee)
 	if err != nil {
-		return nil, err
+		return  err
 	}
-	return result,nil
+	return nil
 }
 
-func (e EmployeeUsecase) updateEmployee(employee *Employee) error {
+func (e EmployeeUsecaseImpl) updateEmployee(employee *Employee) error {
 	err := e.employeeRepo.updateEmployee(employee)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func (e EmployeeUsecase) updateEmployee(employee *Employee) error {
 	return nil
 }
 
-func (e EmployeeUsecase) deleteEmployee(id *string) error {
+func (e EmployeeUsecaseImpl) deleteEmployee(id *string) error {
 	err := e.employeeRepo.deleteEmployee(id)
 	if err != nil {
 		return err
@@ -44,6 +44,6 @@ func (e EmployeeUsecase) deleteEmployee(id *string) error {
 	return nil
 }
 
-func newEmployeeUsecase(db *pg.DB) *EmployeeUsecase {
-	return &EmployeeUsecase{employeeRepo: newEmployeeRepository(db)}
+func newEmployeeUsecase(db *pg.DB) EmployeeUsecase {
+	return &EmployeeUsecaseImpl{newEmployeeRepository(db)}
 }
