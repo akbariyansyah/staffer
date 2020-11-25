@@ -11,9 +11,12 @@ type EmployeeRepository interface {
 	updateEmployee(employee *Employee) error
 	deleteEmployee(id *string) error
 }
+
+//  select me.id,me.full_name,me.birth_date,mp.name,me.id_number,me.gender from m_employee me join m_position mp on (me.position_id=mp.id)
 type EmployeeRepositoryImpl struct {
 	db *pg.DB
 }
+
 func (e EmployeeRepositoryImpl) getAllEmployees() (*[]Employee, error) {
 	var employees []Employee
 
