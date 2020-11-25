@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	g := gin.New()
+	g := gin.Default()
 	c := config.NewConfig()
 	//fmt.Println(os.Getenv("SERVER_HOST"))
 	//fmt.Println(os.Getenv("SERVER_PORT"))
