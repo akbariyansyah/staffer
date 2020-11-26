@@ -1,6 +1,7 @@
 package employee
 
 import (
+	"backend/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
 	"log"
@@ -32,6 +33,11 @@ func (ec *EmployeeController) createEmployee(ctx *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
+	err = helper.ValidateRequest(employee)
+	if err != nil {
+		ctx.JSON(400, "cannot be empty")
+		return
+	}
 	err = ec.employeeUsecase.createEmployee(&employee)
 	if err != nil {
 		ctx.JSON(504, "Internal server error")
@@ -49,6 +55,11 @@ func (ec *EmployeeController) updateEmployee(ctx *gin.Context) {
 
 	if err != nil {
 		log.Println(err)
+	}
+	err = helper.ValidateRequest(employee)
+	if err != nil {
+		ctx.JSON(400, "cannot be empty")
+		return
 	}
 	err = ec.employeeUsecase.updateEmployee(&employee)
 	if err != nil {

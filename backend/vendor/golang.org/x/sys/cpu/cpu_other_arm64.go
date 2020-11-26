@@ -2,10 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build darwin,arm64,!go1.12
+// +build !linux,!netbsd
+// +build arm64
 
-package unix
+package cpu
 
-func Getdirentries(fd int, buf []byte, basep *uintptr) (n int, err error) {
-	return 0, ENOSYS
-}
+func doinit() {}

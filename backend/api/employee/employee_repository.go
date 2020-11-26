@@ -36,16 +36,19 @@ func (e EmployeeRepositoryImpl) createEmployee(employee *Employee) error {
 	stmt, err := tx.Prepare(`INSERT INTO m_employee (id,full_name,birth_date,position_id,id_number,gender) VALUES ($1,$2,$3,$4,$5,$6)`)
 	if err != nil {
 		tx.Rollback()
+		log.Println(err)
 		return err
 	}
 	_, err = stmt.Exec(&employee.ID, &employee.FullName, &employee.BirthDate, &employee.PositionID, &employee.IDNumber, &employee.Gender)
 	if err != nil {
 		tx.Rollback()
+		log.Println(err)
+
 		return err
 	}
 	//userCreated := res.RowsReturned()
 	tx.Commit()
-
+	log.Println(err)
 	return nil
 }
 

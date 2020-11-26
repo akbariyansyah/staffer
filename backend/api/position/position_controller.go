@@ -1,6 +1,7 @@
 package position
 
 import (
+	"backend/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg"
 )
@@ -32,6 +33,11 @@ func (pc PositionController) createPosition(ctx *gin.Context) {
 		ctx.JSON(504, "Failed parsing the JSON")
 		return
 	}
+	err = helper.ValidateRequest(pos)
+	if err != nil {
+		ctx.JSON(400, "cannot be empty")
+		return
+	}
 	err = pc.positionUsecase.createPosition(&pos)
 	if err != nil {
 		ctx.JSON(504, "Internal server error")
@@ -47,6 +53,11 @@ func (pc PositionController) updatePosition(ctx *gin.Context) {
 	err := ctx.BindJSON(&pos)
 	if err != nil {
 		ctx.JSON(504, "Failed parsing the JSON")
+		return
+	}
+	err = helper.ValidateRequest(pos)
+	if err != nil {
+		ctx.JSON(400, "cannot be empty")
 		return
 	}
 	err = pc.positionUsecase.updatePosition(&pos)
