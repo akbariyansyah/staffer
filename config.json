@@ -1,0 +1,18 @@
+{
+  "debug": true,
+  "server": {
+    "host" : "localhost",
+    "port": "9090"
+  },
+  "context":{
+    "timeout":2
+  },
+  "database": {
+    "host": "127.0.0.1",
+    "port": "3306",
+    "user": "root",
+    "pass": "password123",
+    "name": "worker"
+  }
+
+}

@@ -1,0 +1,24 @@
+version: "3.8"
+services: 
+  app:
+    build: .
+    container_name: app-staffer
+    restart: always
+    environment:
+      - SERVER_PORT=9090
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASS=password123
+      - DB_NAME=worker
+    ports:
+      - 9090:9090
+  
+  mysql:
+    container_name: mysql
+    restart: always
+    image: mysql:8.0
+    environment: 
+      - MYSQL_ROOT_PASSWORD=password123
+    volumes:
+      - ./employee.sql:/docker-entrypoint-initdb.d/employee.sql
