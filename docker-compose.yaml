@@ -1,9 +1,13 @@
 version: "3.8"
+
 services: 
   app:
     build: .
     container_name: app-staffer
     restart: always
+    depends_on: 
+      mysql:
+        condition: service_healthy
     environment:
       - SERVER_PORT=9090
       - DB_HOST=mysql
@@ -22,3 +26,7 @@ services:
       - MYSQL_ROOT_PASSWORD=password123
     volumes:
       - ./employee.sql:/docker-entrypoint-initdb.d/employee.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10

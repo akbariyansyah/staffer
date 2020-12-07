@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"os"
 	"staffer/config"
+
 	"staffer/utils"
 )
 
@@ -13,13 +13,12 @@ func main() {
 
 	conf := config.NewConfig()
 	db := config.NewDatabase(conf)
-	fmt.Println(db)
-	e.GET("/", func(ctx echo.Context) error {
-		return ctx.JSON(200, "Hello there")
-	})
+
+	config.NewRoutes(e, db)
 
 	address := os.Getenv("SERVER_PORT")
 	if address == "" {
 		address = utils.ReadConfig("server.port")
 	}
+	e.Logger.Fatal(e.Start(":"+address))
 }

@@ -1,5 +1,7 @@
 package config
 
+import "os"
+
 // Config -> basic database config type
 type Config struct {
 	DB_HOST string
@@ -11,11 +13,17 @@ type Config struct {
 
 func NewConfig() *Config {
 	conf := &Config{}
-	conf.DB_HOST = "localhost"
-	conf.DB_PORT = "3306"
-	conf.DB_USER = "root"
-	conf.DB_PASS = "password123"
-	conf.DB_NAME = "worker"
+	// conf.DB_HOST = "mysql"
+	// conf.DB_PORT = "3306"
+	// conf.DB_USER = "root"
+	// conf.DB_PASS = "password123"
+	// conf.DB_NAME = "worker"
+
+	conf.DB_HOST = os.Getenv("DB_HOST")
+	conf.DB_PORT = os.Getenv("DB_PORT")
+	conf.DB_USER = os.Getenv("DB_USER")
+	conf.DB_PASS = os.Getenv("DB_PASS")
+	conf.DB_NAME = os.Getenv("DB_NAME")
 
 	//switch {
 	//case os.Getenv("DB_HOST") == "":
