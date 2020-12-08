@@ -2,11 +2,10 @@ package employee
 
 import (
 	"errors"
-	"strconv"
 )
 
 type IEmployeeUsecase interface {
-	GetAllEmployees(page, limit string) (map[string]interface{}, error)
+	GetAllEmployees(page, limit int) (map[string]interface{}, error)
 }
 type EmployeeUsecase struct {
 	empRepo IEmployeeRepository
@@ -15,10 +14,9 @@ type EmployeeUsecase struct {
 func NewEmployeeUsecase(empRepo IEmployeeRepository) IEmployeeUsecase {
 	return &EmployeeUsecase{empRepo: empRepo}
 }
-func (eu EmployeeUsecase) GetAllEmployees(page, limit string) (map[string]interface{}, error) {
-	pageInt, _ := strconv.Atoi(page)
-	limitInt, _ := strconv.Atoi(limit)
-	offset := (pageInt * limitInt) - limitInt
+func (eu EmployeeUsecase) GetAllEmployees(page, limit int) (map[string]interface{}, error) {
+
+	offset := (page * limit) - limit
 	totalData, err := eu.empRepo.CountEmployees()
 
 	if err != nil {

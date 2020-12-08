@@ -1,10 +1,10 @@
 package employee
 
 import (
+	"github.com/labstack/echo/v4"
 	"log"
 	"net/http"
-
-	"github.com/labstack/echo/v4"
+	"strconv"
 )
 
 // EmployeeController -> this type connecting controller and usecase layer through interface
@@ -25,8 +25,10 @@ func (ec EmployeeController) HandleGetEmployees(ctx echo.Context) error {
 			"message": "error bad request",
 		})
 	}
-	employees, err := ec.eu.GetAllEmployees(page, limit)
-	
+	pageInt, _ := strconv.Atoi(page)
+	limitInt, _ := strconv.Atoi(limit)
+	employees, err := ec.eu.GetAllEmployees(pageInt, limitInt)
+
 	if err != nil {
 		log.Println(err)
 		return ctx.JSON(501, "internal server error")

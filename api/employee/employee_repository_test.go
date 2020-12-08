@@ -64,9 +64,9 @@ func TestGetEmployees(t *testing.T) {
 
 	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"}).AddRow(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title,employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate)
 
-	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(0, "1").WillReturnRows(rows)
+	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(0, 1).WillReturnRows(rows)
 
-	employee, err := repo.GetAllEmployees(0, "1")
+	employee, err := repo.GetAllEmployees(0, 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, employee)
 

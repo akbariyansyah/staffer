@@ -9,7 +9,7 @@ import (
 
 // IEmployeeRepository -> available method on this layer.
 type IEmployeeRepository interface {
-	GetAllEmployees(offset int, limit string) (*[]model.Employee, error)
+	GetAllEmployees(offset, limit int) (*[]model.Employee, error)
 	CountEmployees() (int, error)
 }
 
@@ -23,7 +23,7 @@ func NewEmployeeRepository(DB *sql.DB) IEmployeeRepository {
 }
 
 // GetAllEmployees -> retrieve all employee from database.
-func (db EmployeeRepository) GetAllEmployees(offset int, limit string) (*[]model.Employee, error) {
+func (db EmployeeRepository) GetAllEmployees(offset, limit int) (*[]model.Employee, error) {
 
 	var employees = []model.Employee{}
 
