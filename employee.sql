@@ -1,7 +1,7 @@
 create database worker;
 use worker;
 create table employee (
-	id INT,
+	id INT PRIMARY KEY auto_increment,
 	full_name VARCHAR(50),
 	email VARCHAR(50),
 	title VARCHAR(50),

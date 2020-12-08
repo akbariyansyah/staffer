@@ -64,9 +64,9 @@ func TestRepo_GetEmployees(t *testing.T) {
 
 	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"}).AddRow(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate)
 
-	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(0, 1).WillReturnRows(rows)
+	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(1, 1).WillReturnRows(rows)
 
-	employee, err := repo.GetAllEmployees(0, 1)
+	employee, err := repo.GetAllEmployees(1, 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, employee)
 	assert.Len(t, employee, 1)
@@ -78,9 +78,9 @@ func TestRepo_GetEmployeesFail(t *testing.T) {
 	defer db.Close()
 	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"})
 
-	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(1000, 10).WillReturnRows(rows)
+	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(0, 10).WillReturnRows(rows)
 
-	employees, err := repo.GetAllEmployees(1000, 10)
+	employees, err := repo.GetAllEmployees(0, 10)
 	assert.Error(t, err)
 	assert.Nil(t, employees)
 }

@@ -27,9 +27,11 @@ func (db EmployeeRepository) GetAllEmployees(offset, limit int) ([]*model.Employ
 
 	var employees = []*model.Employee{}
 
-	rows, err := db.DB.Query("select * from employee limit ?,?", offset, limit)
+	rows, err := db.DB.Query("select * from employee limit ?,?",offset,limit)
+
 	if err != nil {
-		panic(err)
+		log.Printf("FAILED : %v", err)
+		return nil, err
 	}
 	for rows.Next() {
 		emp := new(model.Employee)
