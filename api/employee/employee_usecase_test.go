@@ -9,7 +9,10 @@ import (
 
 func newUsecaseMock() IEmployeeUsecase {
 	conf := config.NewConfig()
-	db := config.NewDatabase(conf)
+	db,err := config.NewDatabase(conf)
+	if err != nil {
+		panic(err)
+	}
 	empRepo := NewEmployeeRepository(db)
 	empUsecase := NewEmployeeUsecase(empRepo)
 	return empUsecase

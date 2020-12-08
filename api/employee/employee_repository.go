@@ -11,6 +11,9 @@ import (
 type IEmployeeRepository interface {
 	GetAllEmployees(offset, limit int) ([]*model.Employee, error)
 	CountEmployees() (int, error)
+	UpdateEmployee(*model.Employee) error
+	CreateEmployee(*model.Employee) error
+	DeleteEmployee(id string) error
 }
 
 // EmployeeRepository -> type that contains the database connection.
@@ -27,7 +30,7 @@ func (db EmployeeRepository) GetAllEmployees(offset, limit int) ([]*model.Employ
 
 	var employees = []*model.Employee{}
 
-	rows, err := db.DB.Query("select * from employee limit ?,?",offset,limit)
+	rows, err := db.DB.Query("select * from employee limit ?,?", offset, limit)
 
 	if err != nil {
 		log.Printf("FAILED : %v", err)
@@ -61,4 +64,70 @@ func (db EmployeeRepository) CountEmployees() (int, error) {
 		return totalData, err
 	}
 	return totalData, nil
+}
+func (db EmployeeRepository) UpdateEmployee(emp *model.Employee) error {
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return err
+	}
+	stmt, err := tx.Prepare("update employee set full_name=?,email=?,title=?,gender=?,phone=?,address=?,is_married=?,birth_date=? where id = ?")
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(emp.FullName, emp.Email, emp.Title, emp.Gender, emp.Phone, emp.Address, emp.IsMarried, emp.BirthDate, emp.ID)
+	if err != nil {
+		tx.Rollback()
+		log.Println(err)
+		return err
+	}
+
+	return tx.Commit()
+}
+func (db EmployeeRepository) CreateEmployee(emp *model.Employee) error {
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return err
+	}
+	stmt, err := tx.Prepare("insert into employee(id,full_name,email,title,gender,phone,address,is_married,birth_date) values(?,?,?,?,?,?,?,?,?)")
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(emp.ID, emp.FullName, emp.Email, emp.Title, emp.Gender, emp.Phone, emp.Address, emp.IsMarried, emp.BirthDate)
+	if err != nil {
+		tx.Rollback()
+		log.Println(err)
+		return err
+	}
+
+	return tx.Commit()
+}
+func (db EmployeeRepository) DeleteEmployee(id string) error {
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return err
+	}
+	stmt, err := tx.Prepare("delete from employee where id = ?")
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		tx.Rollback()
+		log.Println(err)
+		return err
+	}
+
+	return tx.Commit()
 }

@@ -13,8 +13,10 @@ func main() {
 	e := echo.New()
 
 	conf := config.NewConfig()
-	db := config.NewDatabase(conf)
-
+	db,err := config.NewDatabase(conf)
+	if err != nil {
+		panic(err)
+	}
 	api.NewRoutes(e,db)
 
 	address := os.Getenv("SERVER_PORT")

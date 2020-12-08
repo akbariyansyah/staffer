@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"staffer/model"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,7 @@ var employeeMock = &model.Employee{
 	Phone:     "(128) 3181004",
 	Address:   "509 American Ash Avenue",
 	IsMarried: true,
-	BirthDate: "1987-06-13T00:00:00Z",
+	BirthDate: time.Now(),
 }
 
 // NewMock -> initialize new mock of database.

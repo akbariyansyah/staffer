@@ -1,10 +1,12 @@
 package employee
 
 import (
-	"github.com/labstack/echo/v4"
 	"log"
 	"net/http"
+	"staffer/model"
 	"strconv"
+
+	"github.com/labstack/echo/v4"
 )
 
 // Controller -> this type connecting controller and usecase layer through interface
@@ -16,6 +18,8 @@ func NewEmployeeController(e *echo.Echo, service IEmployeeUsecase) {
 	controller := Controller{eu: service}
 	e.GET("/employee", controller.GetEmployees)
 	e.POST("/employee", controller.CreateEmployee)
+	e.PUT("/employee", controller.UpdateEmployee)
+	e.DELETE("/employee/:id", controller.DeleteEmployee)
 }
 func (ec Controller) GetEmployees(ctx echo.Context) error {
 	page := ctx.QueryParam("page")
@@ -35,6 +39,35 @@ func (ec Controller) GetEmployees(ctx echo.Context) error {
 	}
 	return ctx.JSON(200, employees)
 }
-func (ec Controller) CreateEmployee(cxt echo.Context) error {
+func (ec Controller) CreateEmployee(ctx echo.Context) error {
+	request := new(model.Employee)
+	if err := ctx.Bind(request); err != nil {
+		return ctx.JSON(504, "Bad request ")
+	}
+	err := ec.eu.CreateEmployee(request)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(501, "internal server error")
+	}
 	return nil
+}
+func (ec Controller) UpdateEmployee(ctx echo.Context) error {
+	request := new(model.Employee)
+	if err := ctx.Bind(request); err != nil {
+		return ctx.JSON(504, "Bad request ")
+	}
+	err := ec.eu.UpdateEmployee(request)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(501, "internal server error")
+	}
+	return nil
+}
+func (ec Controller) DeleteEmployee(ctx echo.Context) error {
+	id := ctx.Param("id")
+	err := ec.eu.DeleteEmployee(id)
+	if err != nil {
+		return ctx.JSON(504, "bad request")
+	}
+	return ctx.JSON(200, "success")
 }
