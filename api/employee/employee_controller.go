@@ -7,17 +7,17 @@ import (
 	"strconv"
 )
 
-// EmployeeController -> this type connecting controller and usecase layer through interface
-type EmployeeController struct {
+// Controller -> this type connecting controller and usecase layer through interface
+type Controller struct {
 	eu IEmployeeUsecase
 }
 
 func NewEmployeeController(e *echo.Echo, service IEmployeeUsecase) {
-	controller := EmployeeController{eu: service}
-	e.GET("/employee", controller.HandleGetEmployees)
-	e.POST("/employee", controller.HandleCreateEmployee)
+	controller := Controller{eu: service}
+	e.GET("/employee", controller.GetEmployees)
+	e.POST("/employee", controller.CreateEmployee)
 }
-func (ec EmployeeController) HandleGetEmployees(ctx echo.Context) error {
+func (ec Controller) GetEmployees(ctx echo.Context) error {
 	page := ctx.QueryParam("page")
 	limit := ctx.QueryParam("limit")
 	if page == "" || limit == "" {
@@ -35,6 +35,6 @@ func (ec EmployeeController) HandleGetEmployees(ctx echo.Context) error {
 	}
 	return ctx.JSON(200, employees)
 }
-func (ec EmployeeController) HandleCreateEmployee(cxt echo.Context) error {
+func (ec Controller) CreateEmployee(cxt echo.Context) error {
 	return nil
 }

@@ -24,15 +24,15 @@ var employeeMock = &model.Employee{
 }
 
 // NewMock -> initialize new mock of database.
-func NewMock() (*sql.DB, sqlmock.Sqlmock) {
+func NewRepoMock() (*sql.DB, sqlmock.Sqlmock) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		log.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	return db, mock
 }
-func TestCountEmployees(t *testing.T) {
-	db, mock := NewMock()
+func TestRepo_CountEmployees(t *testing.T) {
+	db, mock := NewRepoMock()
 	repo := NewEmployeeRepository(db)
 	defer db.Close()
 
@@ -44,8 +44,8 @@ func TestCountEmployees(t *testing.T) {
 	assert.Equal(t, 1000, totalData)
 	assert.NotNil(t, totalData)
 }
-func TestCountEmployeesFail(t *testing.T) {
-	db, mock := NewMock()
+func TestRepo_CountEmployeesFail(t *testing.T) {
+	db, mock := NewRepoMock()
 	repo := NewEmployeeRepository(db)
 	defer db.Close()
 
@@ -57,17 +57,30 @@ func TestCountEmployeesFail(t *testing.T) {
 	assert.NotEqual(t, 1000, totalData)
 
 }
-func TestGetEmployees(t *testing.T) {
-	db, mock := NewMock()
+func TestRepo_GetEmployees(t *testing.T) {
+	db, mock := NewRepoMock()
 	repo := NewEmployeeRepository(db)
 	defer db.Close()
 
-	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"}).AddRow(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title,employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate)
+	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"}).AddRow(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate)
 
 	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(0, 1).WillReturnRows(rows)
 
 	employee, err := repo.GetAllEmployees(0, 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, employee)
+	assert.Len(t, employee, 1)
+}
+func TestRepo_GetEmployeesFail(t *testing.T) {
+	db, mock := NewRepoMock()
+	repo := NewEmployeeRepository(db)
 
+	defer db.Close()
+	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"})
+
+	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(1000, 10).WillReturnRows(rows)
+
+	employees, err := repo.GetAllEmployees(1000, 10)
+	assert.Error(t, err)
+	assert.Nil(t, employees)
 }

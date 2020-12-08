@@ -9,7 +9,7 @@ import (
 
 // IEmployeeRepository -> available method on this layer.
 type IEmployeeRepository interface {
-	GetAllEmployees(offset, limit int) (*[]model.Employee, error)
+	GetAllEmployees(offset, limit int) ([]*model.Employee, error)
 	CountEmployees() (int, error)
 }
 
@@ -23,9 +23,9 @@ func NewEmployeeRepository(DB *sql.DB) IEmployeeRepository {
 }
 
 // GetAllEmployees -> retrieve all employee from database.
-func (db EmployeeRepository) GetAllEmployees(offset, limit int) (*[]model.Employee, error) {
+func (db EmployeeRepository) GetAllEmployees(offset, limit int) ([]*model.Employee, error) {
 
-	var employees = []model.Employee{}
+	var employees = []*model.Employee{}
 
 	rows, err := db.DB.Query("select * from employee limit ?,?", offset, limit)
 	if err != nil {
@@ -38,13 +38,12 @@ func (db EmployeeRepository) GetAllEmployees(offset, limit int) (*[]model.Employ
 			log.Println(err)
 			return nil, err
 		}
-		employees = append(employees, *emp)
+		employees = append(employees, emp)
 	}
 	if len(employees) == 0 {
-		log.Println("no employee")
 		return nil, errors.New("Offset doesn't found")
 	}
-	return &employees, nil
+	return employees, nil
 }
 
 // CountEmployees -> count all the employee data from database.
