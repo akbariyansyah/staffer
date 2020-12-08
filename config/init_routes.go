@@ -2,8 +2,9 @@ package config
 
 import (
 	"database/sql"
-	"github.com/labstack/echo/v4"
 	"staffer/api/employee"
+
+	"github.com/labstack/echo/v4"
 )
 
 func NewRoutes(e *echo.Echo, db *sql.DB) {

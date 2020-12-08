@@ -1,11 +1,12 @@
 package employee
 
 import (
-	"staffer/model"
+	"errors"
+	"strconv"
 )
 
 type IEmployeeUsecase interface {
-	GetAllEmployees() (*[]model.Employee, error)
+	GetAllEmployees(page, limit string) (map[string]interface{}, error)
 }
 type EmployeeUsecase struct {
 	empRepo IEmployeeRepository
@@ -14,10 +15,24 @@ type EmployeeUsecase struct {
 func NewEmployeeUsecase(empRepo IEmployeeRepository) IEmployeeUsecase {
 	return &EmployeeUsecase{empRepo: empRepo}
 }
-func (eu EmployeeUsecase) GetAllEmployees() (*[]model.Employee, error) {
-	emp, err := eu.empRepo.GetAllEmployees()
+func (eu EmployeeUsecase) GetAllEmployees(page, limit string) (map[string]interface{}, error) {
+	pageInt, _ := strconv.Atoi(page)
+	limitInt, _ := strconv.Atoi(limit)
+	offset := (pageInt * limitInt) - limitInt
+	totalData, err := eu.empRepo.CountEmployees()
+
 	if err != nil {
 		return nil, err
 	}
-	return emp, nil
+	if totalData <= offset {
+		return nil, errors.New("Requested page is not available")
+	}
+	emp, err := eu.empRepo.GetAllEmployees(offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"totalData": totalData,
+		"data":      emp,
+	}, nil
 }

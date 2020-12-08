@@ -20,5 +20,5 @@ func main() {
 	if address == "" {
 		address = utils.ReadConfig("server.port")
 	}
-	e.Logger.Fatal(e.Start(":"+address))
+	e.Logger.Fatal(e.Start("localhost:"+address))
 }
