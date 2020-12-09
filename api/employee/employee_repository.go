@@ -10,6 +10,7 @@ import (
 // IEmployeeRepository -> available method on this layer.
 type IEmployeeRepository interface {
 	GetAllEmployees(offset, limit int) ([]*model.Employee, error)
+	GetEmployeeByID(id string) (*model.Employee, error)
 	CountEmployees() (int, error)
 	UpdateEmployee(*model.Employee) error
 	CreateEmployee(*model.Employee) error
@@ -23,6 +24,17 @@ type EmployeeRepository struct {
 
 func NewEmployeeRepository(DB *sql.DB) IEmployeeRepository {
 	return &EmployeeRepository{DB: DB}
+}
+func (db EmployeeRepository) GetEmployeeByID(id string) (*model.Employee, error) {
+	employee := new(model.Employee)
+
+	err := db.DB.QueryRow("select * from employee where id = ?", id).Scan(&employee.ID, &employee.FullName, &employee.Email, &employee.Title, &employee.Gender, &employee.Phone, &employee.Address, &employee.IsMarried, &employee.BirthDate)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return employee, nil
 }
 
 // GetAllEmployees -> retrieve all employee from database.

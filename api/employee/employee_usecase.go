@@ -7,6 +7,7 @@ import (
 
 type IEmployeeUsecase interface {
 	GetAllEmployees(page, limit int) (map[string]interface{}, error)
+	GetEmployeeByID(id string) (*model.Employee, error)
 	UpdateEmployee(emp *model.Employee) error
 	CreateEmployee(emp *model.Employee) error
 	DeleteEmployee(id string) error
@@ -18,9 +19,17 @@ type EmployeeUsecase struct {
 func NewEmployeeUsecase(empRepo IEmployeeRepository) IEmployeeUsecase {
 	return &EmployeeUsecase{empRepo: empRepo}
 }
+func (eu EmployeeUsecase) GetEmployeeByID(id string) (*model.Employee, error) {
+	employee,err := eu.empRepo.GetEmployeeByID(id)
+	if err != nil {
+		return nil, err
+	}
+	return employee,nil
+}
 func (eu EmployeeUsecase) GetAllEmployees(page, limit int) (map[string]interface{}, error) {
 
 	offset := (page * limit) - limit
+
 	totalData, err := eu.empRepo.CountEmployees()
 
 	if err != nil {
