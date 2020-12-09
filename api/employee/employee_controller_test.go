@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 )
 
 func NewControllerMock() *echo.Echo {
@@ -20,12 +20,15 @@ func NewControllerMock() *echo.Echo {
 	}
 	empRepo := NewEmployeeRepository(db)
 	empUsecase := NewEmployeeUsecase(empRepo)
-	controller := Controller{empUsecase}
+	controller := Controller{eu: empUsecase}
 
 	e := echo.New()
 
 	e.GET("/employee", controller.GetEmployees)
-
+	e.GET("/employee/:id", controller.GetEmployeeByID)
+	e.POST("/employee", controller.CreateEmployee)
+	e.PUT("/employee", controller.UpdateEmployee)
+	e.DELETE("/employee/:id", controller.DeleteEmployee)
 	return e
 }
 
@@ -97,4 +100,42 @@ func TestController_GetEmployeesFail(t *testing.T) {
 			assert.Equal(t, 501, resp.Result().StatusCode, "Response is expected")
 		})
 	}
+}
+func TestController_GetEmployeeByIDFail(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://localhost:4000/employee/9999", nil)
+	if err != nil {
+		t.Fatalf("Failed : %v", err)
+	}
+	resp := httptest.NewRecorder()
+	NewControllerMock().ServeHTTP(resp, req)
+	assert.Equal(t, `{"message":"Bad request"}
+`, resp.Body.String(), "response is expected")
+	assert.Equal(t, 501, resp.Result().StatusCode, "response is expected")
+
+}
+func TestController_GetEmployeeByID(t *testing.T) {
+	req, err := http.NewRequest("GET", "http://localhost:4000/employee/100", nil)
+	if err != nil {
+		t.Fatalf("Failed : %v", err)
+	}
+	resp := httptest.NewRecorder()
+	NewControllerMock().ServeHTTP(resp, req)
+	assert.Equal(t, 200, resp.Result().StatusCode, "Expected result found")
+}
+func TestController_CreateEmployee(t *testing.T) {
+
+}
+func TestController_CreateEmployeeFail(t *testing.T) {
+
+}
+func TestController_UpdateEmployee(t *testing.T) {
+
+}
+func TestController_UpdateEmployeeFail(t *testing.T) {
+
+}
+func TestController_DeleteEmployee(t *testing.T) {
+}
+func TestController_DeleteEmployeeFail(t *testing.T) {
+
 }

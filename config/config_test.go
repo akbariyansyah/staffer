@@ -11,6 +11,10 @@ func TestNewConfig(t *testing.T) {
 	assert.NotNil(t, conf)
 	assert.NotEmpty(t, conf)
 }
+func TestNewConfigFail(t *testing.T) {
+	conf := &Config{}
+	assert.Empty(t, conf)
+}
 func TestNewDatabase(t *testing.T) {
 	conf := NewConfig()
 

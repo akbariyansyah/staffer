@@ -6,7 +6,7 @@ import (
 	"staffer/model"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 )
 
 // Controller this type connecting controller and usecase layer through interface

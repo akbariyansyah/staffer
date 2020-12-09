@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"staffer/api/employee"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 )
 
 func NewRoutes(e *echo.Echo, db *sql.DB) {
