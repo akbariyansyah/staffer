@@ -2,9 +2,8 @@ package api
 
 import (
 	"database/sql"
-	"staffer/api/employee"
-
 	"github.com/labstack/echo"
+	"staffer/api/employee"
 )
 
 func NewRoutes(e *echo.Echo, db *sql.DB) {

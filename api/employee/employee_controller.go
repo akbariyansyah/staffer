@@ -59,6 +59,7 @@ func (ec Controller) GetEmployees(ctx echo.Context) error {
 func (ec Controller) CreateEmployee(ctx echo.Context) error {
 	request := new(model.Employee)
 	if err := ctx.Bind(request); err != nil {
+		log.Println("error here : ", err)
 		return ctx.JSON(504, model.ErrorResponse{
 			Message: "Bad request",
 		})
@@ -70,7 +71,7 @@ func (ec Controller) CreateEmployee(ctx echo.Context) error {
 			Message: "Internal server error",
 		})
 	}
-	return nil
+	return ctx.JSON(201, "created")
 }
 func (ec Controller) UpdateEmployee(ctx echo.Context) error {
 	request := new(model.Employee)

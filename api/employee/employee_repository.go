@@ -82,7 +82,7 @@ func (db EmployeeRepository) UpdateEmployee(emp *model.Employee) error {
 	if err != nil {
 		return err
 	}
-	stmt, err := tx.Prepare("update employee set full_name=?,email=?,title=?,gender=?,phone=?,address=?,is_married=?,birth_date=? where id = ?")
+	stmt, err := tx.Prepare("update employee set full_name=?,email=?,title=?,gender=?,phone=?,address=?,is_married=?,birth_date=? where id=?")
 
 	if err != nil {
 		tx.Rollback()
