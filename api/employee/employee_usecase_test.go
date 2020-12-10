@@ -20,7 +20,8 @@ func TestUsecase_GetAllEmployees(t *testing.T) {
 	empusecase, mock := newUsecaseMock()
 
 	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"}).AddRow(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate)
-
+	rows2 := mock.NewRows([]string{"total_data"}).AddRow(1000)
+	mock.ExpectPrepare(regexp.QuoteMeta("select count(*) as total_data from employee")).ExpectQuery().WillReturnRows(rows2)
 	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(0, 1).WillReturnRows(rows)
 
 	employee, err := empusecase.GetAllEmployees(1, 1)
