@@ -1,40 +1,118 @@
 package employee
 
 import (
+	"github.com/DATA-DOG/go-sqlmock"
+	"regexp"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func newUsecaseMock() IEmployeeUsecase {
-	db, _ := NewRepoMock()
+func newUsecaseMock() (IEmployeeUsecase, sqlmock.Sqlmock) {
+	db, mock := NewRepoMock()
 	empRepo := NewEmployeeRepository(db)
 	empUsecase := NewEmployeeUsecase(empRepo)
-	return empUsecase
+	return empUsecase, mock
 }
+
 func TestUsecase_GetAllEmployees(t *testing.T) {
-	usecase := newUsecaseMock()
-	employees, err := usecase.GetAllEmployees(1, 10)
+	empusecase, mock := newUsecaseMock()
+
+	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"}).AddRow(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate)
+
+	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(0, 1).WillReturnRows(rows)
+
+	employee, err := empusecase.GetAllEmployees(1, 1)
 	assert.NoError(t, err)
-	assert.NotNil(t, employees)
-	assert.Len(t, employees, 2)
+	assert.NotNil(t, employee)
 }
 func TestUsecase_GetAllEmployeesFail(t *testing.T) {
-	employees, err := newUsecaseMock().GetAllEmployees(0, 1)
+	empusecase, mock := newUsecaseMock()
+	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"})
+
+	mock.ExpectQuery(regexp.QuoteMeta("select * from employee limit ?,?")).WithArgs(0, 10).WillReturnRows(rows)
+	employees, err := empusecase.GetAllEmployees(0, 10)
 	assert.Error(t, err)
 	assert.Nil(t, employees)
 }
 func TestEmployeeUsecase_GetEmployeeByID(t *testing.T) {
-	employee, err := newUsecaseMock().GetEmployeeByID("1")
+	empUsecase, mock := newUsecaseMock()
+	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"}).AddRow(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate)
+	mock.ExpectQuery(regexp.QuoteMeta("select * from employee where id = ?")).WithArgs("1").WillReturnRows(rows)
+	emp, err := empUsecase.GetEmployeeByID("1")
 	assert.NoError(t, err)
-	assert.NotNil(t, employee)
+	assert.NotNil(t, emp)
 }
+
 func TestEmployeeUsecase_GetEmployeeByIDFail(t *testing.T) {
-	employee, err := newUsecaseMock().GetEmployeeByID("1000000")
+	empUsecase, mock := newUsecaseMock()
+	rows := mock.NewRows([]string{"id", "full_name", "email", "title", "gender", "phone", "address", "is_married", "birth_date"})
+	mock.ExpectQuery(regexp.QuoteMeta("select * from employee where id = ?")).WithArgs("1000").WillReturnRows(rows)
+	emp, err := empUsecase.GetEmployeeByID("1000")
 	assert.Error(t, err)
-	assert.Nil(t, employee)
+	assert.Nil(t, emp)
+}
+func TestEmployeeUsecase_CreateEmployee(t *testing.T) {
+	empUsecase, mock := newUsecaseMock()
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(regexp.QuoteMeta("insert into employee(id,full_name,email,title,gender,phone,address,is_married,birth_date) values(?,?,?,?,?,?,?,?,?)")).ExpectExec().WithArgs(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+
+	err := empUsecase.CreateEmployee(employeeMock)
+
+	assert.NoError(t, err)
+}
+func TestEmployeeUsecase_CreateEmployeeFail(t *testing.T) {
+	empUsecase, mock := newUsecaseMock()
+	mock.ExpectBegin()
+	mock.ExpectPrepare(regexp.QuoteMeta("insert into employee(id,full_name,email,title,gender,phone,address,is_married,birth_date) values(?,?,?,?,?,?,?,?,?)")).ExpectExec().WithArgs(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate).WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectRollback()
+
+	err := empUsecase.CreateEmployee(employeeMock)
+
+	assert.Error(t, err)
 }
 func TestEmployeeUsecase_UpdateEmployee(t *testing.T) {
-	err := newUsecaseMock().UpdateEmployee(employeeMock)
+	empUsecase, mock := newUsecaseMock()
+	mock.ExpectBegin()
+	mock.ExpectPrepare(regexp.QuoteMeta("update employee set full_name=?,email=?,title=?,gender=?,phone=?,address=?,is_married=?,birth_date=? where id=?")).ExpectExec().WithArgs(employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate, employeeMock.ID).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	err := empUsecase.UpdateEmployee(employeeMock)
+
+	assert.NoError(t, err)
+}
+func TestEmployeeUsecase_UpdateEmployeeFail(t *testing.T) {
+	empUsecase, mock := newUsecaseMock()
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(regexp.QuoteMeta("update employee set full_name=?,email=?,title=?,gender=?,phone=?,address=?,is_married=?,birth_date=? where id=?")).ExpectExec().WithArgs(employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate, employeeMock.ID).WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectRollback()
+
+	err := empUsecase.UpdateEmployee(employeeMock)
+
+	assert.Error(t, err)
+}
+func TestEmployeeUsecase_DeleteEmployee(t *testing.T) {
+	empUsecase, mock := newUsecaseMock()
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare("delete from employee where id = ?").ExpectExec().WithArgs(strconv.Itoa(employeeMock.ID)).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+
+	err := empUsecase.DeleteEmployee(strconv.Itoa(employeeMock.ID))
+	assert.NoError(t, err)
 	assert.Nil(t, err)
+}
+func TestEmployeeUsecase_DeleteEmployeeFail(t *testing.T) {
+	empUsecase, mock := newUsecaseMock()
+	mock.ExpectBegin()
+	mock.ExpectPrepare("delete from employee where id = ?").ExpectExec().WithArgs(strconv.Itoa(employeeMock.ID)).WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectRollback()
+
+	err := empUsecase.DeleteEmployee(strconv.Itoa(employeeMock.ID))
+	assert.Error(t, err)
+	assert.NotNil(t, err)
 }

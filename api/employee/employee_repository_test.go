@@ -126,7 +126,6 @@ func TestEmployeeRepository_CreateEmployee(t *testing.T) {
 
 	repo := NewEmployeeRepository(db)
 
-	repo.CreateEmployee(employeeMock)
 	mock.ExpectBegin()
 	mock.ExpectPrepare(regexp.QuoteMeta("insert into employee(id,full_name,email,title,gender,phone,address,is_married,birth_date) values(?,?,?,?,?,?,?,?,?)")).ExpectExec().WithArgs(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate).WillReturnResult(sqlmock.NewResult(0, 1))
 	mock.ExpectCommit()
@@ -139,8 +138,6 @@ func TestEmployeeRepository_CreateEmployeeFail(t *testing.T) {
 	db, mock := NewRepoMock()
 
 	repo := NewEmployeeRepository(db)
-
-	repo.CreateEmployee(employeeMock)
 	mock.ExpectBegin()
 	mock.ExpectPrepare(regexp.QuoteMeta("insert into employee(id,full_name,email,title,gender,phone,address,is_married,birth_date) values(?,?,?,?,?,?,?,?,?)")).ExpectExec().WithArgs(employeeMock.ID, employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate).WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectRollback()
@@ -154,7 +151,6 @@ func TestEmployeeRepository_UpdateEmployee(t *testing.T) {
 
 	repo := NewEmployeeRepository(db)
 
-	repo.CreateEmployee(employeeMock)
 	mock.ExpectBegin()
 	mock.ExpectPrepare(regexp.QuoteMeta("update employee set full_name=?,email=?,title=?,gender=?,phone=?,address=?,is_married=?,birth_date=? where id=?")).ExpectExec().WithArgs(employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate, employeeMock.ID).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
@@ -168,7 +164,6 @@ func TestEmployeeRepository_UpdateEmployeeFail(t *testing.T) {
 
 	repo := NewEmployeeRepository(db)
 
-	repo.CreateEmployee(employeeMock)
 	mock.ExpectBegin()
 	mock.ExpectPrepare(regexp.QuoteMeta("update employee set full_name=?,email=?,title=?,gender=?,phone=?,address=?,is_married=?,birth_date=? where id=?")).ExpectExec().WithArgs(employeeMock.FullName, employeeMock.Email, employeeMock.Title, employeeMock.Gender, employeeMock.Phone, employeeMock.Address, employeeMock.IsMarried, employeeMock.BirthDate, employeeMock.ID).WillReturnResult(sqlmock.NewResult(0, 0))
 	mock.ExpectRollback()
